@@ -1,10 +1,11 @@
-﻿namespace IntellisenseXMLLocalizer
+﻿namespace Gekka.Language.IntelliSenseXMLTranslator
 {
     using System;
     using System.Linq;
     using System.Collections;
     using System.Collections.Generic;
-
+    using System.Xml;
+    using System.Xml.Linq;
     class Test
     {
         private static string[] TargetTags = new[] { "summary", "returns", "remarks", "params", "typeparams", "exceptions", "examples" };
@@ -298,6 +299,33 @@
         }
 
 
+        public static void TextSelfClose()
+        {
+            string xml= """
+                <?xml version="1.0" encoding="utf-8"?>
+                <doc>
+                    <assembly>
+                        <name>PresentationCore</name>
+                    </assembly>
+                    <members>
+                        <member name="P:System.Windows.FreezableCollection`1.System#Collections#IList#Item(System.Int32)">
+                          <summary>For a description of this member, see <see cref="P:System.Collections.IList.Item(System.Int32)" />.</summary>
+                          <param name="index" />
+                          <returns>The element at the specified index.</returns>
+                        </member>
+                        <member name="T:System.Windows.FreezableCollection`1.Enumerator">
+                          <summary>Enumerates the members of a <see cref="T:System.Windows.FreezableCollection`1" />.</summary>
+                          <typeparam name="T" />
+                        </member>
+                    </members>
+                </doc>
+                """;
+        }
+    }
 
+    static class XMLExention
+    {
+        public static IEnumerable<XmlNode> XmlNodes(this System.Xml.XmlNode node) => node.ChildNodes.OfType<XmlNode>();
+        public static IEnumerable<XmlNode> XmlNodesNotText(this System.Xml.XmlNode node) => node.XmlNodes().Where(_ => !(_ is XmlText));
     }
 }

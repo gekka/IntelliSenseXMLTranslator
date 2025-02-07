@@ -22,126 +22,159 @@
         /// <param name="originalFile">元のXMLのパス</param>
         /// <param name="repairedXMLFile">修復したXMLのパス</param>
         /// <returns>不正がないか修復出来たらtrue,修復してみても不正のままならfalse</returns>
-        public static RepairResult RepairXML(string originalFile, string repairedXMLFile)
+        public static RepairResult RepairXML(System.IO.FileInfo originalFile, System.IO.FileInfo repairedXMLFile)
         {
+            var xml = ReadOriginalXMLString(originalFile.FullName);
+            var result = RepairXML(xml, out var repaired);
+            if (result == RepairResult.Broken)
+            {
+                return RepairResult.Broken;
+            }
+
+            repairedXMLFile.Delete();
+
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(repairedXMLFile.FullName, false, new System.Text.UTF8Encoding(true)))
+            {
+                sw.Write(repaired);
+            }
+
+            return result;
+        }
+
+        /// <inheritdoc cref="RepairXML(System.IO.FileInfo, System.IO.FileInfo)"/>
+        internal static RepairResult RepairXML(string xml, out string repaired)
+        {
+            repaired = xml;
             bool hasBroken = true;
-            string xml = ReadOriginalXMLString(originalFile);
             for (int i = 0; i < 1 && hasBroken; i++)
             {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 System.IO.TextWriter tw = new System.IO.StringWriter(sb);
                 hasBroken = RepaireNode(xml, tw);
-                xml = sb.ToString();
-            }
-            //if (hasBroken)
-            //{
-            //    throw new ApplicationException("XMLファイルに異常がありますが修復できませんでした");
-            //}
-            System.IO.File.Delete(repairedXMLFile);
-
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(repairedXMLFile, false, new System.Text.UTF8Encoding(true)))
-            {
-                sw.Write(xml);
+                repaired = sb.ToString();
             }
 
-            return RepaireRoot(repairedXMLFile, hasBroken);
-        }
-
-        private static string ReadOriginalXMLString(string originalFile)
-        {
-            using (System.IO.StreamReader sr = new System.IO.StreamReader(originalFile, true))
+            var repaireResult = RepaireRoot(repaired, out repaired);
+            if (repaireResult == RepairResult.NoBroken && hasBroken)
             {
-                return sr.ReadToEnd();
+                return RepairResult.Repaired;
+            }
+            else
+            {
+                return repaireResult;
             }
         }
 
-        private static bool RepaireNode(string xml, System.IO.TextWriter tw)
+
+        internal static bool RepaireNode(string xml, System.IO.TextWriter tw)
         {
             bool hasBroken = false;
-            //string xml;
-            //using (System.IO.StreamReader sr = new System.IO.StreamReader(originalFile, true))
-            //{
-            //    xml = sr.ReadToEnd();
-            //}
 
             string[] tags = new string[] { "summary", "remarks", "returns", "param", "paramref", "typeparam", "typeparamref", "value", "exception" };
             var pattern = string.Join("|", tags.Select(tagName => $"(<{tagName}.+?</{tagName}>)"));
+            pattern = "(?<TAGNAME>" + pattern + ")";
             System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex(pattern, System.Text.RegularExpressions.RegexOptions.Singleline);
 
             int lastIndex = 0;
 
-
-
             Dictionary<string, int> dicBrokenTagCount = new Dictionary<string, int>();
 
-            //using (System.IO.StreamWriter sw = new System.IO.StreamWriter(repairedXMLFile, false, new System.Text.UTF8Encoding(true)))
+            foreach (var match in reg.EnumerateMatches(xml))
             {
-                foreach (var match in reg.EnumerateMatches(xml))
+                var text = xml.Substring(match.Index, match.Length);
+                try
                 {
-                    var text = xml.Substring(match.Index, match.Length);
-                    //bool issuccess;
-                    try
+                    using (var sr = new System.IO.StringReader(text))
                     {
-                        using (var sr = new System.IO.StringReader(text))
-                        {
-                            System.Xml.XmlReader xr = System.Xml.XmlReader.Create(sr);
-                            while (xr.Read()) { }
-                        }
-
-                        continue;
-                    }
-                    catch (System.Xml.XmlException)
-                    {
+                        System.Xml.XmlReader xr = System.Xml.XmlReader.Create(sr);
+                        while (xr.Read()) { }
                     }
 
-                    hasBroken = true;
-
-                    var index = text.IndexOfAny(new char[] { ' ', '>', '/' });
-                    var tagName = text.Substring(1, index - 1).Trim();
-                    if (tagName != null)
-                    {
-                        if (dicBrokenTagCount.TryGetValue(tagName, out var count))
-                        {
-                            dicBrokenTagCount[tagName] = count + 1;
-                        }
-                        else
-                        {
-                            dicBrokenTagCount[tagName] = 1;
-                        }
-                    }
-                    tw.Write(xml.AsSpan(lastIndex, match.Index - lastIndex));
-                    //sw.Write("<returns>!!! BROKEN !!!</returns>");
-                    tw.Write($"<?broken {text} ?>");
-                    lastIndex = match.Index + match.Length;
-
+                    continue;
+                }
+                catch (System.Xml.XmlException)
+                {
                 }
 
-                tw.Write(xml.AsSpan(lastIndex, xml.Length - lastIndex));
-                tw.Flush();
+                hasBroken = true;
+
+                var index = text.IndexOfAny(new char[] { ' ', '>', '/' });
+                var tagName = text.Substring(1, index - 1).Trim();
+
+                if (tagName != null)
+                {
+                    if (dicBrokenTagCount.TryGetValue(tagName, out var count))
+                    {
+                        dicBrokenTagCount[tagName] = count + 1;
+                    }
+                    else
+                    {
+                        dicBrokenTagCount[tagName] = 1;
+                    }
+                }
+                tw.Write(xml.AsSpan(lastIndex, match.Index - lastIndex));
+                //sw.Write("<returns>!!! BROKEN !!!</returns>");
+                tw.Write($"<?broken {text} ?>");
+                lastIndex = match.Index + match.Length;
+
             }
+
+            tw.Write(xml.AsSpan(lastIndex, xml.Length - lastIndex));
+            tw.Flush();
 
             return hasBroken;
         }
 
-
-
-        /// <summary>XMLのルートがおかしい状態を修正する</summary>
-        /// <param name="repairedXMLFile"></param>
-        /// <param name="hasBroken"></param>
-        /// <returns></returns>
-        private static RepairResult RepaireRoot(string repairedXMLFile, bool hasBroken)
+        /// <inheritdoc cref="RepaireRoot(string,out string)"/>
+        internal static RepairResult RepaireRoot(System.IO.FileInfo source, System.IO.FileInfo repaired)
         {
-            System.Xml.XmlDocument xdoc;
             try
             {
-                xdoc = new System.Xml.XmlDocument();
-                xdoc.Load(repairedXMLFile);
+                var xdoc = new System.Xml.XmlDocument();
+                xdoc.Load(source.FullName);
+                var result = RepaireRoot(xdoc);
+                if (result == RepairResult.Repaired)
+                {
+                    xdoc.Save(repaired.FullName);
+                }
+                return result;
+            }
+            catch
+            {
+                return RepairResult.Broken;
+            }
+        }
 
+        /// <summary>XMLのルートがおかしい状態を修正する</summary>
+        /// <param name="source">修復対象のXML</param>
+        /// <param name="repaired">修復対象のXML</param>
+        /// <returns>
+        /// RepairResult.NoBroken : 修復不要
+        /// RepairResult.Repaired : 修復されたか
+        /// RepairResult.Broken   : 修復できなかった
+        /// </returns>
+        internal static RepairResult RepaireRoot(string source, out string repaired)
+        {
+            repaired = source;
+
+            var xdoc = new System.Xml.XmlDocument();
+            xdoc.LoadXml(source);
+            var result = RepaireRoot(xdoc);
+            if (result == RepairResult.Repaired)
+            {
+                repaired = xdoc.OuterXml;
+            }
+            return result;
+        }
+
+        private static RepairResult RepaireRoot(System.Xml.XmlDocument xdoc)
+        {
+            try
+            {
                 if (DocXml.GetDocMembersNode(xdoc, out var members))
                 {
-                    return hasBroken ? RepairResult.Repaired : RepairResult.NoBroken;
+                    return RepairResult.NoBroken;
                 }
-
 
                 // なぜか<?xml><span><doc></doc><span> になっているXMLがある(netstandard.xml ～2.0だよ)
                 // <?xml><doc></doc>に修正
@@ -163,8 +196,6 @@
                                 xdoc.RemoveChild(cn0);
                                 xdoc.AppendChild(doc);
 
-                                xdoc.Save(repairedXMLFile);
-
                                 return RepairResult.Repaired;
                             }
                         }
@@ -176,6 +207,14 @@
             catch
             {
                 return RepairResult.Broken;
+            }
+        }
+
+        private static string ReadOriginalXMLString(string originalFile)
+        {
+            using (System.IO.StreamReader sr = new System.IO.StreamReader(originalFile, true))
+            {
+                return sr.ReadToEnd();
             }
         }
     }

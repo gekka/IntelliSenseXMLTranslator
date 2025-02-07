@@ -1,4 +1,8 @@
-﻿namespace Gekka.Language.IntelliSenseXMLTranslator
+﻿#if DEBUG
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("TestProject")]
+#endif
+
+namespace Gekka.Language.IntelliSenseXMLTranslator
 {
     using System;
     using System.Collections.Generic;
@@ -14,11 +18,6 @@
     {
         static async Task Main(string[] args)
         {
-
-            
-            
-
-
             if (args.Length == 0)
             {
                 return;

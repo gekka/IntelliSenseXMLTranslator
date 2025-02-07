@@ -9,12 +9,12 @@
         /// <summary>ファイルからXMLを読み込む</summary>
         /// <param name="xmlFile"></param>
         /// <returns></returns>
-        public static DocXml Load(string xmlFile)
+        public static DocXml Load(System.IO.FileInfo xmlFile)
         {
             string repairedXMLFile = System.IO.Path.GetTempFileName();
             try
             {
-                var repairResult = XmlChecker.RepairXML(xmlFile, repairedXMLFile);
+                var repairResult = XmlChecker.RepairXML(xmlFile, new System.IO.FileInfo(repairedXMLFile));
 
                 XmlDocument doc = new XmlDocument();
                 using (var filestream = System.IO.File.OpenRead(repairedXMLFile))

@@ -99,7 +99,7 @@
                 DocXml dx;
                 try
                 {
-                    dx = DocXml.Load(inputXML);
+                    dx = DocXml.Load(new System.IO.FileInfo(inputXML));
                 }
                 catch (Exception ex)
                 {

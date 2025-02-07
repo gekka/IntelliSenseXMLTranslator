@@ -10,6 +10,8 @@
     <RootNamespace>Gekka.Language.IntellisenseXMLLocalizer</RootNamespace>
     <BaseOutputPath>../Output</BaseOutputPath>
       <!--<LangVersion>10.0</LangVersion>-->
+
+	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -20,9 +22,6 @@
     <NoWarn>1701;1702;8981</NoWarn>
   </PropertyGroup>
 
-  <!--<ItemGroup>
-	<Folder Include="DataFiles\" />
-  </ItemGroup>-->
   <ItemGroup>
     <Content Include="..\DataFiles\Dictionary.ja.dat" Link="DataFiles\Dictionary.ja.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
