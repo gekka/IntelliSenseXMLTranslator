@@ -1,29 +1,33 @@
 {
-  "profiles": {
+    "profiles": {
 
-    "直接指定されたXMLファイルを翻訳 file": {
-      "commandName": "Project",
-      "commandLineArgs": "/Point BeforeWithBR /Dictionary Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir result /VersionType Latest  \"C:\\Program Files\\dotnet\\packs\\Microsoft.WindowsDesktop.App.Ref\" \"C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\" "
-    },
-    "リストファイルで指定のファイルを翻訳 list": {
-      "commandName": "Project",
-      "commandLineArgs": "/Point BeforeWithBR /Dictionary Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir result /VersionType Latest  \"InputXmlFiles.list\" /SkipFiles SkipFiles.list"
-    },
-    "翻訳元ファイルの列挙のみ /Test list": {
-      "commandName": "Project",
-      "commandLineArgs": "/Test \"InputXmlFiles.list\" /SkipFiles SkipFiles.list"
-    },
-    "翻訳元ファイルのXMLの正常チェック /TestXML list": {
-      "commandName": "Project",
-      "commandLineArgs": "/TestXML \"InputXmlFiles.list\" /SkipFiles SkipFiles.list"
-    },
-    "ヘルプ表示 /?": {
-      "commandName": "Project",
-      "commandLineArgs": "/?"
-    },
-    "IntelliSenseXMLTranslator2": {
-      "commandName": "Project",
-      "commandLineArgs": "/p BeforeWithBR /d Dictionary.ja.dat /dt text /T BrowserTranslator /O result  \"C:/Users/YAMAMOTO/.nuget/packages/entityframeworkcore.jet\""
+        "直接指定されたXMLファイルを翻訳 file": {
+            "commandName": "Project",
+            "commandLineArgs": "/Point BeforeWithBR /Dictionary Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir result /VersionType Latest  \"C:\\Program Files\\dotnet\\packs\\Microsoft.WindowsDesktop.App.Ref\" \"C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\" "
+        },
+        "リストファイルで指定のファイルを翻訳 list": {
+            "commandName": "Project",
+            "commandLineArgs": "/Point BeforeWithBR /Dictionary Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir result /VersionType Latest  \"InputXmlFiles.list\" /SkipFiles SkipFiles.list"
+        },
+        "翻訳元ファイルの列挙のみ /Test list": {
+            "commandName": "Project",
+            "commandLineArgs": "/Test \"InputXmlFiles.list\" /SkipFiles SkipFiles.list"
+        },
+        "翻訳元ファイルのXMLの正常チェック /TestXML list": {
+            "commandName": "Project",
+            "commandLineArgs": "/TestXML \"InputXmlFiles.list\" /SkipFiles SkipFiles.list "
+        },
+        "翻訳元ファイルのXMLの正常チェックDumm /TestXML list": {
+            "commandName": "Project",
+            "commandLineArgs": "/Translator Dummy /TestXML \"InputXmlFiles.list\" /SkipFiles SkipFiles.list "
+        },
+        "ヘルプ表示 /?": {
+            "commandName": "Project",
+            "commandLineArgs": "/?"
+        },
+        "IntelliSenseXMLTranslator2": {
+            "commandName": "Project",
+            "commandLineArgs": "/p BeforeWithBR /d Dictionary.ja.dat /dt text /T BrowserTranslator /O result  \"C:/Users/YAMAMOTO/.nuget/packages/entityframeworkcore.jet\""
+        }
     }
-  }
 }

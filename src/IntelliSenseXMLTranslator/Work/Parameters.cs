@@ -38,6 +38,9 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
         [CommandLineArgs(nameof(OutputDir), "O", "出力先フォルダ")]
         public string OutputDir { get; set; } = "result";
 
+        [CommandLineArgs(nameof(Force), "F", "翻訳済みなら上書き",hasParameter:false)]
+        public bool Force { get; set; } = false;
+
         [CommandLineArgs(nameof(VersionType), "Ver", "最後のバージョンだけにするか")]
         public VersionType VersionType { get; set; } = VersionType.Latest;
 

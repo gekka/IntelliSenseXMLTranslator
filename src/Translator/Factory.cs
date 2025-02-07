@@ -17,6 +17,7 @@ namespace Gekka.Language.Translator
                 new BrowserTranslatorFactory(),
                 new DeepLWebTranslatorFactory(),
                 //new DeepLAPITranslatorFactory(),
+                new DummyTranslatorFactory(),
             };
         }
 

@@ -40,6 +40,9 @@
 
         public bool IsCheckXMLOnly { get; set; } = false;
 
+        /// <summary>翻訳済みファイルを上書きするか</summary>
+        public bool IsForeOverwrite { get; set; } = false;
+
         //変換結果をどのように挿入もしくは置換するか
         public InsertPoint InsertPoint { get; set; } = InsertPoint.RemoveOriginal;
 
@@ -72,10 +75,24 @@
                 //var outputXML = System.IO.Path.Combine(outputDir, xml);
                 if (File.Exists(outputXML) && !IsCheckXMLOnly)
                 {
-                    //既に変換済みのファイル
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("翻訳済みなのでスキップします");
-                    continue;
+                    if (IsForeOverwrite)
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(outputXML);
+                        }
+                        catch(Exception ex)
+                        {
+                            throw new ApplicationException("翻訳済みファイルを上書きできませんでした\r\n" + outputXML, ex);
+                        }
+                    }
+                    else
+                    {
+                        //既に変換済みのファイル
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("翻訳済みなのでスキップします");
+                        continue;
+                    }
                 }
                 Console.ResetColor();
 
