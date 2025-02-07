@@ -48,16 +48,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="..\DataFiles\Dictionary.ja.dat" Link="Dictionary.ja.dat">
+    <Content Include="..\DataFiles\Dictionary.ja.dat" Link="DataFiles\Dictionary.ja.dat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\DataFiles\InputXmlFIles.list" Link="InputXmlFIles.list">
+    <None Include="..\DataFiles\InputXmlFIles.list" Link="DataFiles\InputXmlFIles.list">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="..\DataFiles\SkipFiles.list" Link="SkipFiles.list">
+    <None Include="..\DataFiles\SkipFiles.list" Link="DataFiles\SkipFiles.list">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -69,6 +69,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Translator\Translator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataFiles\" />
   </ItemGroup>
 
 </Project>
