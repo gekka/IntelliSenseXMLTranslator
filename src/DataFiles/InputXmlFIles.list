@@ -4,25 +4,31 @@
 ##
 
 ################################################################################
+# 基本的なライブラリ用
 
 # "%ProgramFiles%\dotnet\packs\*.Ref*"
 
-# "%ProgramFiles%\dotnet\packs\Microsoft.AspNetCore.App.Ref"
-# "%ProgramFiles%\dotnet\packs\Microsoft.NETCore.App.Ref"
-# "%ProgramFiles%\dotnet\packs\NETStandard.Library.Ref"
-  "%ProgramFiles%\dotnet\packs\Microsoft.WindowsDesktop.App.Ref"
-
-# "%ProgramFiles%\dotnet\packs\Microsoft.MacCatalyst.Ref.net9.0_18.1"
-# "%ProgramFiles%\dotnet\packs\Microsoft.iOS.Ref.net9.0_18.1"
-# "%ProgramFiles%\dotnet\packs\Microsoft.Android.Ref.35"
+ "%ProgramFiles%\dotnet\packs\Microsoft.AspNetCore.App.Ref"
+ "%ProgramFiles%\dotnet\packs\Microsoft.NETCore.App.Ref"
+ "%ProgramFiles%\dotnet\packs\Microsoft.WindowsDesktop.App.Ref"
+ 
+ "%ProgramFiles%\dotnet\packs\NETStandard.Library.Ref"
 
 ################################################################################
 
-"%USERPROFILE%\.nuget\packages\microsoft.entityframeworkcore*"
+# "%ProgramFiles%\dotnet\packs\Microsoft.Android.Ref.35"
+# "%ProgramFiles%\dotnet\packs\Microsoft.iOS.Ref.net9.0_18.1"
+# "%ProgramFiles%\dotnet\packs\Microsoft.MacCatalyst.Ref.net9.0_18.1"
 
-#  "%USERPROFILE%\.nuget\packages\netstandard.library"
-#  "%USERPROFILE%\.nuget\packages\netstandard.library\2.*"
-#  "%USERPROFILE%\.nuget\packages\netstandard.library\1.*"
+################################################################################
+# nugetで参照するライブラリ用
+
+ "%USERPROFILE%\.nuget\packages\microsoft.entityframeworkcore*"
+
+ "%USERPROFILE%\.nuget\packages\netstandard.library"
+ "%USERPROFILE%\.nuget\packages\netstandard.library\2.*"
+ "%USERPROFILE%\.nuget\packages\netstandard.library\1.*"
 
 
 # "%USERPROFILE%\.nuget\packages\microsoft.identity.client"
+# "%USERPROFILE%\.nuget\packages\netstandard.library\2.0.3\build\netstandard2.0\ref\netstandard.xml"

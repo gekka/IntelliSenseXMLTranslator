@@ -56,63 +56,94 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Util
         {
             var def = new T();
 
-            var ar = PropertyInfoPair.Get<T>().ToArray();
-            if (ar.Length > 0)
+            string offset1 = "  ";
+            string offset2 = "    ";
+
+            var pps = PropertyInfoPair.Get<T>().ToArray();
+            if (pps.Length > 0)
             {
-                writer.WriteLine("Parameter List");
-                foreach (var temp in ar)
+                writer.WriteLine("コマンドライン引数");
+
+                foreach (var pp in pps)
                 {
-                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                    if (temp.Setting.IsMissingList)
+                    //System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    if (pp.Setting.IsMissingList)
                     {
-                        sb.AppendLine("  [arguments]");
+                        WriteLines(1, "[arguments]");
                     }
                     else
                     {
-
-
-                        sb.Append("  " + string.Join(" ", new[] { temp.Setting.Long, temp.Setting.Short }.Distinct().Where(_ => !string.IsNullOrWhiteSpace(_)).Select(_ => "/" + _)));
-                        if (temp.Setting.HasParameter)
+                        writer.Write(offset1 + string.Join(" ", new[] { pp.Setting.Long, pp.Setting.Short }.Distinct().Where(_ => !string.IsNullOrWhiteSpace(_)).Select(_ => "/" + _)));
+                        if (pp.Setting.HasParameter)
                         {
-                            sb.Append(" @value");
+                            writer.Write(" @value");
                         }
-                        sb.AppendLine();
+                        writer.WriteLine();
                     }
 
-                    if (!string.IsNullOrWhiteSpace(temp.Setting.Description))
-                    {
-                        sb.AppendLine("    " + temp.Setting.Description);
-                    }
 
-                    if (temp.Setting.HasParameter)
+
+                    if (pp.Setting.HasParameter)
                     {
-                        var pt = temp.pi.PropertyType;
+                        WriteLines(2, "@value");
+                        var pt = pp.pi.PropertyType;
                         if (pt.IsEnum)
                         {
                             bool isFlag = pt.GetCustomAttributes(typeof(FlagsAttribute), true).Any();
                             if (isFlag)
                             {
-                                sb.AppendLine("     Flag= " + string.Join(",", Enum.GetNames(pt)));
+                                WriteLines(3, "Flag = " + string.Join(",", Enum.GetNames(pt)));
                             }
                             else
                             {
-                                sb.AppendLine("     Switch= " + string.Join("|", Enum.GetNames(pt)));
+                                WriteLines(3, "Switch= " + string.Join("|", Enum.GetNames(pt)));
                             }
                         }
 
-                        if (!temp.Setting.IsMissingList && temp.pi.PropertyType.IsValueType)
+                        if (!pp.Setting.IsMissingList && pp.pi.PropertyType.IsValueType)
                         {
-                            var defvalue = temp.pi.GetValue(def)?.ToString();
+                            var defvalue = pp.pi.GetValue(def)?.ToString();
                             if (!string.IsNullOrEmpty(defvalue))
                             {
-                                sb.AppendLine("     Default=" + defvalue);
+                                WriteLines(3, "Default=" + defvalue);
                             }
                         }
                     }
 
-                    writer.WriteLine(sb.ToString());
+                    if (!string.IsNullOrWhiteSpace(pp.Setting.Description))
+                    {
+                        writer.WriteLine();
+                        WriteLines(2, pp.Setting.Description);
+                    }
 
+                    if (pp.pi.PropertyType.IsEnum)
+                    {
+                        var enumtype = pp.pi.PropertyType;
+                        var enumfiels = enumtype.GetFields().Select(_ => new { PI = _, Attr = _.GetCustomAttribute<EnumParameterDescriptionAttribute>() }).Where(_ => _.Attr != null).ToArray();
+                        if (enumfiels.Length > 0)
+                        {
+                            writer.WriteLine();
+                            WriteLines(2, "各スイッチの説明");
+                            foreach (var temp in enumfiels)
+                            {
+                                writer.WriteLine();
+                                WriteLines(3, temp.PI.Name);
+                                WriteLines(4, temp.Attr!.Text);
+                            }
+                        }
+                    }
 
+                    writer.WriteLine();
+                }
+            }
+
+            void WriteLines(int lv, string text)
+            {
+                string offset = new string(' ', lv * 2);
+                using var sr = new System.IO.StringReader(text);
+                while (sr.Peek() != -1)
+                {
+                    writer.WriteLine(offset + sr.ReadLine());
                 }
             }
         }
@@ -278,4 +309,14 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Util
         }
     }
 
+
+    [System.AttributeUsage(System.AttributeTargets.Field)]
+    class EnumParameterDescriptionAttribute : System.Attribute
+    {
+        public EnumParameterDescriptionAttribute(string text)
+        {
+            this.Text = text;
+        }
+        public string Text { get; }
+    }
 }

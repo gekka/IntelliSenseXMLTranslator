@@ -321,19 +321,24 @@
     enum InsertPoint
     {
         /// <summary>元の文字列の前に翻訳文字列を挿入してから改行</summary>
+        [Util.EnumParameterDescription("元の文字列の前に翻訳文字列を挿入してから改行")]
         Before,
 
         /// <summary>元の文字列の前に翻訳文字列を挿入してからBRタグを挿入</summary>
+        [Util.EnumParameterDescription("元の文字列の前に翻訳文字列を挿入してからBRタグを挿入")]
         BeforeWithBR,
 
         /// <summary>元の文字列の後に改行してから翻訳文字列を挿入</summary>
+        [Util.EnumParameterDescription("元の文字列の後に改行してから翻訳文字列を挿入")]
         After,
 
         /// <summary>元の文字列の前にBRタグを挿入してから翻訳文字列を挿入</summary>
+        [Util.EnumParameterDescription("元の文字列の前にBRタグを挿入してから翻訳文字列を挿入")]
         AfterWithBR,
 
 
         /// <summary>元の文字列を翻訳文字列で上書き</summary>
+        [Util.EnumParameterDescription("元の文字列を翻訳文字列で上書き")]
         RemoveOriginal
     }
 }

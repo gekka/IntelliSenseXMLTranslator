@@ -6,15 +6,20 @@
 
     class DocXml
     {
+        #region static
+
         /// <summary>ファイルからXMLを読み込む</summary>
         /// <param name="xmlFile"></param>
+        /// <param name="log"></param>
         /// <returns></returns>
-        public static DocXml Load(System.IO.FileInfo xmlFile)
+        public static DocXml Load(System.IO.FileInfo xmlFile, System.IO.TextWriter log)
         {
             string repairedXMLFile = System.IO.Path.GetTempFileName();
             try
             {
-                var repairResult = XmlChecker.RepairXML(xmlFile, new System.IO.FileInfo(repairedXMLFile));
+                var checker = new XmlChecker(log);
+
+                var repairResult = checker.RepairXML(xmlFile, new System.IO.FileInfo(repairedXMLFile));
 
                 XmlDocument doc = new XmlDocument();
                 using (var filestream = System.IO.File.OpenRead(repairedXMLFile))
@@ -50,7 +55,7 @@
                         GetTextNodes(member, list);
                     }
 
-                    dx.Items.AddRange(list.Select(_ => new DocXmlItem(_)));
+                    dx.Items.AddRange(list.Select(node => new DocXmlItem(node)));
                 }
                 return dx;
             }
@@ -80,6 +85,21 @@
                 GetTextNodes(n, list);
             }
         }
+
+        /// <summary>
+        /// &lt;?xml&gt;&lt;doc&gt;&lt;/doc&gt;を探す
+        /// </summary>
+        /// <param name="docOrNode"></param>
+        /// <param name="members">見つかったmembers</param>
+        /// <returns></returns>
+        public static bool GetDocMembersNode(System.Xml.XmlNode docOrNode, out IList<System.Xml.XmlNode> members)
+        {
+            members = docOrNode.SelectNodes("doc/members")?.XmlNodes().ToList()
+                ?? (IList<System.Xml.XmlNode>)System.Array.Empty<System.Xml.XmlNode>();
+            return members.Count != 0;
+        }
+
+        #endregion
 
         private DocXml(XmlDocument doc)
         {
@@ -129,18 +149,6 @@
             }
         }
 
-        /// <summary>
-        /// &lt;?xml&gt;&lt;doc&gt;&lt;/doc&gt;を探す
-        /// </summary>
-        /// <param name="docOrNode"></param>
-        /// <param name="members">見つかったmembers</param>
-        /// <returns></returns>
-        public static bool GetDocMembersNode(System.Xml.XmlNode docOrNode, out IList<System.Xml.XmlNode> members)
-        {
-            members = docOrNode.SelectNodes("doc/members")?.XmlNodes().ToList()
-                ?? (IList<System.Xml.XmlNode>)System.Array.Empty<System.Xml.XmlNode>();
-            return members.Count != 0;
-        }
     }
 
 }

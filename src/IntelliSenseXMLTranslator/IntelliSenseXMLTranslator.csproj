@@ -6,7 +6,6 @@
       <!--<TargetFramework>net6.0-windows</TargetFramework>-->
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PlatformTarget>x64</PlatformTarget>
     <RootNamespace>Gekka.Language.IntellisenseXMLLocalizer</RootNamespace>
     <BaseOutputPath>../Output</BaseOutputPath>
       <!--<LangVersion>10.0</LangVersion>-->
@@ -35,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Gekka.MSBuild.targets.SignTool" Version="0.2.9150.31270" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.118" />
   </ItemGroup>

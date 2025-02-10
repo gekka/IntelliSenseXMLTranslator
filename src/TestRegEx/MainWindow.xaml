@@ -1,0 +1,44 @@
+﻿<Window x:Class="WpfApp1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="300" Width="800">
+    
+    <Grid>
+       
+        <StackPanel>
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type TextBox}">
+                    <Setter Property="Foreground" Value="Green" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=Success}" Value="false">
+                            <Setter Property="TextElement.Foreground" Value="Red" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StackPanel.Resources>
+            
+            <Label>正規表現</Label>
+            <TextBox Text="{Binding Path=Pattern,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                     FontSize="16">
+            </TextBox>
+            <TextBlock Text="{Binding Path=Message}" Foreground="red"/>
+
+            <ItemsControl ItemsSource="{Binding Path=Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <Label>検査文字1</Label>
+                            <TextBox  Text="{Binding Path=Text,UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="true" Height="50" VerticalScrollBarVisibility="Visible" />
+                            <TextBox IsReadOnly="True" Text="{Binding Path=Result,Mode=OneWay}" Style="{x:Null}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </StackPanel>
+    </Grid>
+</Window>

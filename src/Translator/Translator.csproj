@@ -6,7 +6,7 @@
 		
         <ImplicitUsings>disable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>10.0</LangVersion>
         <AssemblyName>Gekka.Language.Translator</AssemblyName>
         <RootNamespace>Gekka.Language.Translator</RootNamespace>
     </PropertyGroup>
@@ -39,7 +39,7 @@
     
     
     <ItemGroup>
-        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
+        <PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

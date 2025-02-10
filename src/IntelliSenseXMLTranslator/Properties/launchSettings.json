@@ -3,11 +3,11 @@
 
         "直接指定されたXMLファイルを翻訳 file": {
             "commandName": "Project",
-            "commandLineArgs": "/Point BeforeWithBR /Dictionary Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir result /VersionType Latest  \"C:\\Program Files\\dotnet\\packs\\Microsoft.WindowsDesktop.App.Ref\" \"C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\" "
+            "commandLineArgs": "/Point BeforeWithBR /Dictionary DataFiles\\Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir result /VersionType Latest  \"C:\\Program Files\\dotnet\\packs\\Microsoft.WindowsDesktop.App.Ref\" \"C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\" "
         },
         "リストファイルで指定のファイルを翻訳 list": {
             "commandName": "Project",
-            "commandLineArgs": "/Point BeforeWithBR /Dictionary Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir result /VersionType Latest  \"DataFiles\\InputXmlFiles.list\" /SkipFiles DataFiles\\SkipFiles.list"
+            "commandLineArgs": "/Point BeforeWithBR /Dictionary DataFiles\\Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir result /VersionType Latest  \"DataFiles\\InputXmlFiles.list\" /SkipFiles DataFiles\\SkipFiles.list"
         },
         "翻訳元ファイルの列挙のみ /Test list": {
             "commandName": "Project",
@@ -19,7 +19,7 @@
         },
         "翻訳元ファイルのXMLの正常チェックDummy /TestXML list": {
             "commandName": "Project",
-            "commandLineArgs": "/Translator Dummy /TestXML \"DataFiles\\InputXmlFiles.list\" /SkipFiles DataFiles\\SkipFiles.list "
+            "commandLineArgs": "/Translator Dummy /TestXML \"DataFiles\\InputXmlFiles.list\" /SkipFiles DataFiles\\SkipFiles.list /VersionType All"
         },
         "ヘルプ表示 /?": {
             "commandName": "Project",
