@@ -8,7 +8,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-
+    using System.IO.Compression;
     using Gekka.Language.IntelliSenseXMLTranslator.Util;
     using Gekka.Language.IntelliSenseXMLTranslator.Work;
     using Gekka.Language.Translator;
@@ -91,7 +91,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
             {
                 factory = fs.Where(f => f.TranslatorName.ToLower() == parameters.Translator!.ToLower()).FirstOrDefault();
             }
-            
+
             if (factory == null)
             {
                 WriteFactoryNames("翻訳機が見つかりません", fs);
@@ -142,12 +142,92 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
                     worker.InsertPoint = parameters.InsertPoint;
                     worker.IsCheckXMLOnly = parameters.TestXML;
 
-                    var targetXMLFiles = parameters.GetFiles();
+                    var targetXMLFiles = parameters.GetFiles().ToArray();
 
-                    await worker.RunAsync(targetXMLFiles, parameters.OutputDir);
+                    await worker.RunAsync(targetXMLFiles, parameters.OutputDir,parameters.Language);
+
+                    if (parameters.Zip)
+                    {
+                        Zip(parameters, targetXMLFiles);
+                    }
 
                     System.Console.WriteLine("終了");
                 }
+            }
+        }
+
+        static void Zip(Parameters parameters, IEnumerable<InOutFile> targetXMLFiles)
+        {
+            if (!parameters.Zip)
+            {
+                return;
+            }
+            var user=System.Environment.ExpandEnvironmentVariables("%USERPROFILE%\\");
+            var current = System.IO.Directory.GetCurrentDirectory();
+            try
+            {
+                System.IO.Directory.SetCurrentDirectory(parameters.OutputDir);
+
+                foreach (var listSourceGroup in targetXMLFiles.Where(_ => !string.IsNullOrEmpty(_.ListSource)).GroupBy(_ => _.ListSource))
+                {
+                    if (listSourceGroup.Key == null) continue;
+
+                    foreach (var versionGroup in listSourceGroup.GroupBy(_ => _.Ver))
+                    {
+                        System.Diagnostics.Debug.WriteLine(listSourceGroup.Key + " | " + versionGroup.Key);
+                        string zipPath;
+                        if (versionGroup.Key == null)
+                        {
+
+                            zipPath = System.IO.Path.GetFileName(listSourceGroup.Key) ?? "temp";
+                        }
+                        else if (listSourceGroup.Key.EndsWith(versionGroup.Key.Original))
+                        {
+                            zipPath = new System.IO.DirectoryInfo(listSourceGroup.Key).Parent!.Name + ".v" + versionGroup.Key.Original;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                        zipPath += ".zip";
+                        zipPath = System.IO.Path.Combine(parameters.OutputDir, zipPath);
+                        //string zipPath = "test.zip";
+
+                        using (System.IO.FileStream zipStream = new System.IO.FileStream(zipPath, System.IO.FileMode.Create))
+                        using (System.IO.Compression.ZipArchive archive = new System.IO.Compression.ZipArchive(zipStream, System.IO.Compression.ZipArchiveMode.Create))
+                        {
+                            foreach (InOutFile inoutFile in versionGroup)
+                            {
+                                var xml = inoutFile.GetLangXMLPath(parameters.OutputDir, parameters.Language);
+                                if (System.IO.File.Exists(xml))
+                                {
+                                    string relativePath = System.IO.Path.GetRelativePath(parameters.OutputDir, xml);
+
+                                    {
+                                        var relativeX=relativePath.Replace("：", ":");
+                                        if (relativeX.StartsWith(user))
+                                        {
+                                            relativePath = "％USERPROFILE％\\" + relativePath.Substring(user.Length);
+                                        }
+                                    }
+                                    archive.CreateEntryFromFile(xml, relativePath);
+                                }
+                                else
+                                {
+                                    //翻訳されなくてファイルがない場合がある。
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new System.ApplicationException("ZIPファイルへの圧縮が失敗しました", ex);
+            }
+            finally
+            {
+                System.IO.Directory.SetCurrentDirectory(current);
             }
         }
 

@@ -10,9 +10,22 @@
         public string Input { get;}
         //private string Output { get; set; }
 
+        public string? ListSource { get; set; } = null;
+        public LongVersion? Ver { get; set; }
+
+        public InOutFile TrySetListSource(string path)
+        {
+            if (string.IsNullOrWhiteSpace(this.ListSource))
+            {
+                this.ListSource = path;
+            }
+            return this;
+        }
+
         /// <summary>
         /// dllのあるフォルダの下に作られる言語フォルダに作られるxmlファイルのパス
         /// </summary>
+        /// <param name="outputBaseDir"></param>
         /// <param name="lang"></param>
         /// <returns></returns>
         public string GetLangXMLPath(string outputBaseDir, string lang)

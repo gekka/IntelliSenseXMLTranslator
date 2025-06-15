@@ -40,7 +40,7 @@
                 ret = ret.Where(_ => !skip.Contains(System.IO.Path.GetFileName(_.Input.ToLower())));
             }
             return ret;
-                
+
         }
 
         private IEnumerable<InOutFile> GetFiles(string pathFileOrDirectory)
@@ -58,7 +58,7 @@
             string ext = System.IO.Path.GetExtension(pathFileOrDirectory).ToLower();
             if (System.IO.File.Exists(pathFileOrDirectory) && ext == EXT_LIST)
             {
-                return Util.ListFileReader.ReadListFile(pathFileOrDirectory).SelectMany(_ => GetFiles(_));
+                return Util.ListFileReader.ReadListFile(pathFileOrDirectory).SelectMany(_ => GetFiles(_).Select(inoutfile => inoutfile.TrySetListSource(_)));
             }
             else if (System.IO.File.Exists(pathFileOrDirectory) && ext == EXT_XML)
             {
@@ -76,7 +76,7 @@
                     //pathFileOrDirectory =System.IO.Path.GetFullPath( pathFileOrDirectory.TrimEnd('*'));
                     var parent = System.IO.Path.GetDirectoryName(pathFileOrDirectory) ?? "";
 
-                    return System.IO.Directory.GetDirectories(parent, dirName).SelectMany(_=>GetDirecotryFiles(_));
+                    return System.IO.Directory.GetDirectories(parent, dirName).SelectMany(_ => GetDirecotryFiles(_).Select(inoutfile => inoutfile.TrySetListSource(_)));
                 }
                 else
                 {
@@ -114,7 +114,14 @@
                     IEnumerable<InOutFile> ie;
                     if (grp.Key)
                     {
-                        ie = GetDirecotryFiles(grp.OrderBy(_ => _.Ver!, new LongVersion.Compare()).Last().Dir);
+                        var last = grp.OrderBy(_ => _.Ver!, new LongVersion.Compare()).Last();
+                        var dirVer = last.Dir;
+                        ie = GetDirecotryFiles(dirVer).Select(inoutFile =>
+                        {
+                            inoutFile.ListSource = last.Dir;
+                            inoutFile.Ver = last.Ver;
+                            return inoutFile;
+                        });
                     }
                     else
                     {
@@ -188,22 +195,30 @@
         {
             this._Values = ie.ToArray();
         }
-
+        public LongVersion(IEnumerable<long> ie,string original)
+        {
+            this._Values = ie.ToArray();
+            this._Original = original;
+        }
         //public long[] Values => values;
         private long[] _Values;
 
+        public string Original => _Original;
+        private string _Original = "";
+
         static readonly Regex reg = new Regex(@"^\d+(.-?\d+)*$");
+
         public static LongVersion? Parse(string name)
         {
             if (!string.IsNullOrEmpty(name))
             {
-                if (name.Contains("preview"))
+                if (name.Contains("preview") || name.Contains("alpha"))
                 {
                 }
-                var name2 = name.Replace("-preview", ".-1");
+                var name2 = name.Replace("-preview", ".-1").Replace("-alpha", ".-1000").Replace("-beta", ".-900");
                 if (reg.IsMatch(name2))
                 {
-                    return new LongVersion(name2.Split(".").Select(_ => long.Parse(_)));
+                    return new LongVersion(name2.Split(".").Select(_ => long.Parse(_)), name);
                 }
             }
             return null;

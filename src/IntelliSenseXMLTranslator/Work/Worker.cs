@@ -50,12 +50,15 @@
         //{
         //    return RunAsync(System.IO.Directory.GetFiles( sourceDir,"*.xml", System.IO.SearchOption.TopDirectoryOnly), outputDir);
         //}
-        public async Task RunAsync(IEnumerable<InOutFile> in_outs, string outputDir, string toLang = "ja")//IEnumerable<string> sourceFiles, string outputDir)
+        public async Task<List<InOutFile>> RunAsync(IEnumerable<InOutFile> in_outs, string outputDir, string toLang = "ja")//IEnumerable<string> sourceFiles, string outputDir)
         {
             outputDir = string.IsNullOrWhiteSpace(outputDir) ? Directory.GetCurrentDirectory() : outputDir;
 
+            List<InOutFile> ret = new List<InOutFile>();
+
             foreach (InOutFile in_out in in_outs)
             {
+                ret.Add(in_out);
 
                 string inputXML = in_out.Input;
                 string outputXML = in_out.GetLangXMLPath(outputDir, toLang);//.Output;
@@ -161,6 +164,7 @@
                     dictionary.SaveChanges();
                 }
             }
+            return ret;
         }
 
         /// <summary>翻訳対象のみになるようにフィルターする</summary>

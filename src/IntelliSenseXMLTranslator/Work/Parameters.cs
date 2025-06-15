@@ -56,6 +56,12 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
         [CommandLineArgs("Files", "", "入力元のフォルダかファイル(.xml or .list)のパス\r\n\r\n直接XMLファイルを指定するか、リストファイルで指定します", IsRequired = true, IsMissingList = true)]
         public List<string> Paths { get; } = new List<string>();
 
+        [CommandLineArgs(nameof(Language), "L", "翻訳先言語", Default = "ja")]
+        public string Language { get; set; } = "ja";
+
+        [CommandLineArgs(nameof(Zip), "Z", "結果をZip圧縮する", hasParameter:false)]
+        public bool Zip { get; set; } =false;
+
         [CommandLineArgs("Help", "?", "ヘルプ", false)]
         public bool Help { get; set; }
 
