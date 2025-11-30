@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataFiles", "DataFiles", "{
 		DataFiles\Dictionary.ja.dat = DataFiles\Dictionary.ja.dat
 		DataFiles\InputXmlFIles.list = DataFiles\InputXmlFIles.list
 		DataFiles\SkipFiles.list = DataFiles\SkipFiles.list
+		DataFiles\SkipTokens.list = DataFiles\SkipTokens.list
 		DataFiles\xmlファイルの調査メモ.txt = DataFiles\xmlファイルの調査メモ.txt
 	EndProjectSection
 EndProject

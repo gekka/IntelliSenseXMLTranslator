@@ -14,11 +14,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702;8981</NoWarn>
+    <NoWarn>1591;1701;1702;8981</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn>1701;1702;8981</NoWarn>
+    <NoWarn>1591;1701;1702;8981</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -29,8 +29,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="..\DataFiles\SkipFiles.list" Link="DataFiles\SkipFiles.list">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+	<None Include="..\DataFiles\SkipTokens.list" Link="DataFiles\SkipTokens.list">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
 
   <ItemGroup>

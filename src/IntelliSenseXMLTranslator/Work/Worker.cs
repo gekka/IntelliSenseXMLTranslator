@@ -41,10 +41,12 @@
         public bool IsCheckXMLOnly { get; set; } = false;
 
         /// <summary>翻訳済みファイルを上書きするか</summary>
-        public bool IsForeOverwrite { get; set; } = false;
+        public bool IsForOverwrite { get; set; } = false;
 
         //変換結果をどのように挿入もしくは置換するか
         public InsertPoint InsertPoint { get; set; } = InsertPoint.RemoveOriginal;
+
+        public SkipTokens SkipTokens { get; set; } = new SkipTokens();
 
         //public Task RunAsync(string sourceDir, string outputDir)
         //{
@@ -78,7 +80,7 @@
                 //var outputXML = System.IO.Path.Combine(outputDir, xml);
                 if (File.Exists(outputXML) && !IsCheckXMLOnly)
                 {
-                    if (IsForeOverwrite)
+                    if (IsForOverwrite)
                     {
                         try
                         {
@@ -138,10 +140,24 @@
                     continue;
                 }
 
+
                 WorkingParameter parameter = new WorkingParameter(dictionary);
 
                 // 辞書に登録されていない文の一覧を取得
                 await WorkGetSentensesAsync(parameter, textRanges);
+
+                foreach (var k in parameter.UnTranslatedPairs.Keys.ToArray())
+                {
+                    if (SkipTokens.IsKip(k))
+                    {
+                        parameter.TranslatedDictionary.Add(k, k);
+                        parameter.UnTranslatedPairs.Remove(k);
+                    }
+                    else
+                    {
+                    }
+                }
+
 
                 if (parameter.UnTranslatedPairs.Count > 0)
                 {//翻訳対象の文が存在するなら、その文を翻訳させて辞書に追加
@@ -237,11 +253,7 @@
                     await multi.GetLocalizeTextAsync(parameter.UnTranslatedPairs, token);
                     foreach (var kv in parameter.UnTranslatedPairs)
                     {
-                        if (kv.Value != null)
-                        {
-                            parameter.TranslatedDictionary.Add(kv.Key, kv.Value);
-                            parameter.IsChanged = true;
-                        }
+                        TryAddTranslated(parameter, kv.Key, kv.Value);
                     }
                 }
                 finally
@@ -271,10 +283,38 @@
                         return true;
                     });
                     parameter.UnTranslatedPairs[original] = result;
-                    parameter.TranslatedDictionary.Add(original, result);
+
+                    TryAddTranslated(parameter, original, result);
                 }
             }
         }
+
+        private void TryAddTranslated(WorkingParameter parameter, string key, string? result)
+        {
+            if (key == null || result == null)
+            {
+                return;
+            }
+
+            if (reg.IsMatch(key))
+            {//アセンブラの説明の可能性
+
+                var xx = new string[] { "、", "、" };
+                if (key.Contains(",") && result.Contains("、"))
+                {
+                    if (key == result.Replace("、", ","))
+                    {
+                        result = key;
+                    }
+                }
+            }
+
+            parameter.TranslatedDictionary.Add(key, result);
+            parameter.IsChanged = true;
+
+        }
+        private static System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex(@"([A-Z]{4})|([A-Z]{3}\d+)");
+
 
         /// <summary>辞書を参照して文字列置換を実行する</summary>
         /// <param name="parameter"></param>

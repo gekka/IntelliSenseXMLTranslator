@@ -8,6 +8,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.DB
 {
     internal interface IStringDictionary : System.Collections.Generic.IDictionary<string, string>,IDisposable
     {
+         /// <summary>保存</summary>
         void SaveChanges();
     }
 }

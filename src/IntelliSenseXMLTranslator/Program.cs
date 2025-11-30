@@ -81,6 +81,8 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
 
         static async Task MainAsync(Parameters parameters, System.Threading.CancellationToken token)
         {
+            SkipTokens skip = parameters.CreateSkipTokens();
+
             var fs = Gekka.Language.Translator.Factory.GetTranslatorFactories().ToArray();
             ITranslatorFactory? factory = null;
             if (parameters.TestXML)
@@ -127,12 +129,21 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
             DB.IStringDictionary dictionary;
             if (parameters.DictionaryType == DB.DBType.Text)
             {
-                dictionary = new DB.StringDictionary(parameters.Dictionary, true);
+                if (string.IsNullOrWhiteSpace(parameters.DiffDictionary) || parameters.Dictionary == parameters.DiffDictionary)
+                {
+                    dictionary = new DB.StringDictionary(parameters.Dictionary, true);
+                }
+                else
+                {
+                    dictionary = new DB.DiffStringDictionary(new DB.StringDictionary(parameters.Dictionary, false), parameters.DiffDictionary, true);
+                }
             }
             else
             {
                 dictionary = new DB.SQLStringDictionary(parameters.Dictionary, "Text");
             }
+
+
 
             using (dictionary as IDisposable)
             {
@@ -141,10 +152,11 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
                     Worker worker = new Worker(dictionary, translator, token);
                     worker.InsertPoint = parameters.InsertPoint;
                     worker.IsCheckXMLOnly = parameters.TestXML;
+                    worker.SkipTokens = skip;
 
                     var targetXMLFiles = parameters.GetFiles().ToArray();
 
-                    await worker.RunAsync(targetXMLFiles, parameters.OutputDir,parameters.Language);
+                    await worker.RunAsync(targetXMLFiles, parameters.OutputDir, parameters.Language);
 
                     if (parameters.Zip)
                     {
@@ -162,7 +174,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
             {
                 return;
             }
-            var user=System.Environment.ExpandEnvironmentVariables("%USERPROFILE%\\");
+            var user = System.Environment.ExpandEnvironmentVariables("%USERPROFILE%\\");
             var current = System.IO.Directory.GetCurrentDirectory();
             try
             {
@@ -204,7 +216,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
                                     string relativePath = System.IO.Path.GetRelativePath(parameters.OutputDir, xml);
 
                                     {
-                                        var relativeX=relativePath.Replace("：", ":");
+                                        var relativeX = relativePath.Replace("：", ":");
                                         if (relativeX.StartsWith(user))
                                         {
                                             relativePath = "％USERPROFILE％\\" + relativePath.Substring(user.Length);

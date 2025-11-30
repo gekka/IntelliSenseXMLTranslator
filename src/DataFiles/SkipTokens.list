@@ -1,0 +1,51 @@
+﻿## 翻訳対象から除外する
+
+################################################################################
+
+__m128
+__m256
+__m512
+__mask
+_mask_
+_scatter_
+svlasta_n
+svlastb_n
+GF2P8
+KMOV
+LASTA
+LASTB
+LDFF1
+svbool_t
+svfloat32_t
+svfloat64_t
+svint16_t
+svint32_t
+svint64_t
+svint8_t
+svuint16_t
+svuint32_t
+svuint64_t
+svuint8_t
+VBLENDMPD
+VCMPP
+VPCMP
+VCOMPRESS
+VPCOMPRESS
+VEXPAND
+VPEXPAND
+VBLEND
+VPBLEND
+VCVT
+VFPCLASS
+VGF2P8AFFINE
+VGF2P8MULB
+VMINMAX
+VMOV
+VMPSADBW
+VPCLMUL
+RDFFR Presult.B
+WRFFR Pop.B
+void svwrffr
+
+
+

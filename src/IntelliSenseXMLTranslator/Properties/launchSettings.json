@@ -3,7 +3,7 @@
 
     "直接指定されたXMLファイルを翻訳 file": {
       "commandName": "Project",
-      "commandLineArgs": "/Point BeforeWithBR /Dictionary DataFiles\\Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir \"$(SolutionDir)result\" /VersionType Latest  \"C:\\Program Files\\dotnet\\packs\\Microsoft.WindowsDesktop.App.Ref\" \"C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\" ",
+      "commandLineArgs": "/Point BeforeWithBR /Dictionary DataFiles\\Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir \"$(SolutionDir)result\" /VersionType Latest   /SkipTokens \"DataFiles\\SkipTokens.list\" \"C:\\Program Files\\dotnet\\packs\\Microsoft.WindowsDesktop.App.Ref\" \"C:\\Program Files\\dotnet\\packs\\Microsoft.NETCore.App.Ref\" ",
       "environmentVariables": {
         "PP_ProjectDir": "$(ProjectDir)",
         "PP_SolutionDir": "$(SolutionDir)"
@@ -12,7 +12,15 @@
     },
     "リストファイルで指定のファイルを翻訳 list": {
       "commandName": "Project",
-      "commandLineArgs": "/Point BeforeWithBR /Dictionary DataFiles\\Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir \"$(SolutionDir)result\" /VersionType Latest  \"DataFiles\\InputXmlFiles.list\" /SkipFiles DataFiles\\SkipFiles.list",
+      "commandLineArgs": "/Point BeforeWithBR /Dictionary DataFiles\\Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir \"$(SolutionDir)result\" /VersionType Latest  \"DataFiles\\InputXmlFiles.list\" /SkipFiles DataFiles\\SkipFiles.list  /SkipTokens \"DataFiles\\SkipTokens.list\"",
+      "environmentVariables": {
+        "PP_ProjectDir": "$(ProjectDir)",
+        "PP_SolutionDir": "$(SolutionDir)"
+      }
+    },
+    "リストファイルで指定のファイルを翻訳 list 差分": {
+      "commandName": "Project",
+      "commandLineArgs": "/Point BeforeWithBR /Dictionary DataFiles\\Dictionary.ja.dat /DiffDictionary DataFiles\\Dictionary.ja.diff.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir \"$(SolutionDir)result\" /VersionType Latest  \"DataFiles\\InputXmlFiles.list\" /SkipFiles \"DataFiles\\SkipFiles.list\" /SkipTokens \"DataFiles\\SkipTokens.list\"",
       "environmentVariables": {
         "PP_ProjectDir": "$(ProjectDir)",
         "PP_SolutionDir": "$(SolutionDir)"
@@ -20,7 +28,7 @@
     },
     "リストファイルで指定のファイルを翻訳 list (ZIPで圧縮する)": {
       "commandName": "Project",
-      "commandLineArgs": "/Point BeforeWithBR /Zip /Dictionary DataFiles\\Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir \"$(SolutionDir)result\" /VersionType Latest  \"DataFiles\\InputXmlFiles.list\" /SkipFiles DataFiles\\SkipFiles.list",
+      "commandLineArgs": "/Point BeforeWithBR /Zip /Dictionary DataFiles\\Dictionary.ja.dat /DicType text /Translator \"BrowserTranslator\" /OutputDir \"$(SolutionDir)result\" /VersionType Latest  \"DataFiles\\InputXmlFiles.list\" /SkipFiles \"DataFiles\\SkipFiles.list\" /SkipTokens \"DataFiles\\SkipTokens.list\"",
       "environmentVariables": {
         "PP_ProjectDir": "$(ProjectDir)",
         "PP_SolutionDir": "$(SolutionDir)"

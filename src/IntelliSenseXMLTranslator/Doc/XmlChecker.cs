@@ -159,7 +159,7 @@
             return rr;
         }
 
-        private BrokenCheckResult CheckXMLString(string text, bool isWriteLog)
+        private BrokenCheckResult CheckXMLString(string text, bool isWriteLog, bool detail = false)
         {
             try
             {
@@ -176,7 +176,14 @@
             {
                 if (isWriteLog)
                 {
-                    Log?.WriteLine($"{ex.Message}\r\n不正なXMLを検出\r\n{text}");
+                    if (detail)
+                    {
+                        Log?.WriteLine($"{ex.Message}\r\n不正なXMLを検出\r\n{text}");
+                    }
+                    else
+                    {
+                        Log?.WriteLine($"{ex.Message}\r\n不正なXMLを検出");
+                    }
                 }
 
                 return BrokenCheckResult.Broken;

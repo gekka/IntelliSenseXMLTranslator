@@ -6,6 +6,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
     using Gekka.Language.IntelliSenseXMLTranslator;
     using Gekka.Language.IntelliSenseXMLTranslator.Util;
     using IntelliSenseXMLTranslator.DB;
+    using OpenQA.Selenium.DevTools.V130.DOMSnapshot;
 
     class Parameters
     {
@@ -20,16 +21,19 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
         }
 
 
-        [CommandLineArgs(nameof(Dictionary), "D", "辞書ファイル",Description ="配布されているDictionary.ja.datあるいは自作の辞書ファイルを指定します")]
+        [CommandLineArgs(nameof(Dictionary), "D", "辞書ファイル", Description = "配布されているDictionary.ja.datあるいは自作の辞書ファイルを指定します")]
         public string Dictionary { get; set; } = "data.db";
 
-        [CommandLineArgs("DicType", "DT", "辞書ファイル種類",Description ="標準ではテキスト辞書を使用します。\r\n必要ならSQliteの辞書を作成もできます")]
+        [CommandLineArgs(nameof(DiffDictionary), "Diff", "辞書ファイル", Description = "辞書ファイルがTextの場合に、差分として書き込まれる辞書ファイルを指定します")]
+        public string DiffDictionary { get; set; } = "";
+
+        [CommandLineArgs("DicType", "DT", "辞書ファイル種類", Description = "標準ではテキスト辞書を使用します。\r\n必要ならSQliteの辞書を作成もできます")]
         public DBType DictionaryType { get; set; } = DBType.Text;
 
-        [CommandLineArgs(nameof(Translator), "T", "翻訳機の名前", IsRequired = true,Description ="後述の翻訳機の名前のいずれかを指定します")]
+        [CommandLineArgs(nameof(Translator), "T", "翻訳機の名前", IsRequired = true, Description = "後述の翻訳機の名前のいずれかを指定します")]
         public string? Translator { get; set; }
 
-        [CommandLineArgs(nameof(Browser), "B", "使用するブラウザの名前", IsRequired = true,Description ="ブラウザ翻訳させる場合に使用するブラウザ名を指定します")]
+        [CommandLineArgs(nameof(Browser), "B", "使用するブラウザの名前", IsRequired = true, Description = "ブラウザ翻訳させる場合に使用するブラウザ名を指定します")]
         public BrowserNames Browser { get; set; } = BrowserNames.Chrome;
 
         [CommandLineArgs("Point", "P", "翻訳結果をどのように表示させるかを指定します")]
@@ -38,7 +42,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
         [CommandLineArgs(nameof(OutputDir), "O", "出力先フォルダを指定します\r\n\r\n出力は元ファイルのフルパスの構造を模倣します。\r\nドライブレター以下をそのドライブにコピーすると翻訳ファイルを適用できます。")]
         public string OutputDir { get; set; } = "result";
 
-        [CommandLineArgs(nameof(Force), "F", "翻訳済みでも上書きするかのフラグ",hasParameter:false)]
+        [CommandLineArgs(nameof(Force), "F", "翻訳済みでも上書きするかのフラグ", hasParameter: false)]
         public bool Force { get; set; } = false;
 
         [CommandLineArgs(nameof(VersionType), "Ver", "最後のバージョンだけにするか")]
@@ -50,8 +54,11 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
         [CommandLineArgs(nameof(TestXML), "", "対象となるファイルのXMLが正常であるか確認する", hasParameter: false)]
         public bool TestXML { get; set; } = false;
 
-        [CommandLineArgs(nameof(SkipFiles), "S", "標準では処理不可能としてスキップするリストファイル\r\n\r一部のファイルで不正な構造のXMLのために処理不可能な場合がある。\r\nそのようなファイルを無視リストアフィルで指定する")]
+        [CommandLineArgs(nameof(SkipFiles), "S", "標準では処理不可能としてスキップするリストファイル\r\n\r\n一部のファイルで不正な構造のXMLのために処理不可能な場合がある。\r\nそのようなファイルを無視リストアフィルで指定する")]
         public string SkipFiles { get; set; } = "";
+
+        [CommandLineArgs(nameof(SkipTokens), "SKT", "このsリストファイルに含まれている単語を含む文章を翻訳対象から除外する\r\n\r\nアセンブラなどの説明はアセンブラそのままなので翻訳させたくない場合がある。")]
+        public string SkipTokens { get; set; } = "";
 
         [CommandLineArgs("Files", "", "入力元のフォルダかファイル(.xml or .list)のパス\r\n\r\n直接XMLファイルを指定するか、リストファイルで指定します", IsRequired = true, IsMissingList = true)]
         public List<string> Paths { get; } = new List<string>();
@@ -59,8 +66,8 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
         [CommandLineArgs(nameof(Language), "L", "翻訳先言語", Default = "ja")]
         public string Language { get; set; } = "ja";
 
-        [CommandLineArgs(nameof(Zip), "Z", "結果をZip圧縮する", hasParameter:false)]
-        public bool Zip { get; set; } =false;
+        [CommandLineArgs(nameof(Zip), "Z", "結果をZip圧縮する", hasParameter: false)]
+        public bool Zip { get; set; } = false;
 
         [CommandLineArgs("Help", "?", "ヘルプ", false)]
         public bool Help { get; set; }
@@ -71,15 +78,45 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
             var selector = new FilesSelector(this.Paths, this.VersionType);
             if (!string.IsNullOrWhiteSpace(SkipFiles) && System.IO.File.Exists(SkipFiles))
             {
-                var skip= Util.ListFileReader.ReadListFile(SkipFiles).Select(_=>_.ToLower()).ToArray();
+                var skip = Util.ListFileReader.ReadListFile(SkipFiles).Select(_ => _.ToLower()).ToArray();
                 selector.SkipFiles.AddRange(skip);
             }
             return selector.GetFiles();
         }
 
+        internal SkipTokens CreateSkipTokens()
+        {
+
+            if (!string.IsNullOrWhiteSpace(SkipTokens))
+            {
+                return new SkipTokens(SkipTokens);
+            }
+            else
+            {
+                return  new SkipTokens();
+            }
+        }
     }
 
 
+    class SkipTokens
+    {
+        public SkipTokens()
+        {
+            Tokens = new List<string>();
+        }
+        public SkipTokens(string skipTokenFilePath)
+        {
+            Tokens = Util.ListFileReader.ReadListFile(skipTokenFilePath).ToList();
+        }
+
+        public List<string> Tokens { get; }
+
+        public bool IsKip(string text)
+        {
+            return this.Tokens.Count != 0 && this.Tokens.Any(_ => text.Contains(_, System.StringComparison.Ordinal));
+        }
+    }
 
 
 }
