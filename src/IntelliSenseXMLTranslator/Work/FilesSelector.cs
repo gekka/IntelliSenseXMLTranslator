@@ -218,7 +218,7 @@
                 var name2 = name.Replace("-preview", ".-1").Replace("-alpha", ".-1000").Replace("-beta", ".-900");
                 if (reg.IsMatch(name2))
                 {
-                    return new LongVersion(name2.Split(".").Select(_ => long.Parse(_)), name);
+                    return new LongVersion(name2.Split('.').Select(_ => long.Parse(_)), name);
                 }
             }
             return null;

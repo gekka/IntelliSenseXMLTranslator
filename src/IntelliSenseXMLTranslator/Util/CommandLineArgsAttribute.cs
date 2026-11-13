@@ -152,6 +152,16 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Util
         public static void Parse<T>(T target, string[] args) where T : class
         {
             IList<PropertyInfoPair> pps = PropertyInfoPair.Get<T>().ToList();
+            HashSet<PropertyInfoPair> requires = pps.Where(_ => _.Setting.IsRequired).ToHashSet();
+
+            var missings = pps.Where(_ => _.Setting.IsMissingList).ToArray();
+
+            if (missings.Count() > 1)
+            {
+                throw new ApplicationException("Invalid Settings");
+            }
+
+            bool hasMissing = missings.Length == 1;
 
             var isMissing = pps.Where(_ => _.Setting.IsMissingList).LastOrDefault();
             IList<string> list = isMissing?.pi.GetValue(target) as IList<string> ?? new List<string>();
@@ -159,47 +169,98 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Util
             var dicL = pps.Where(_ => !_.Setting.IsMissingList && !string.IsNullOrWhiteSpace(_.Setting.Long)).ToDictionary(_ => _.Setting.Long.ToLower());
             var dicS = pps.Where(_ => !_.Setting.IsMissingList && !string.IsNullOrWhiteSpace(_.Setting.Short)).ToDictionary(_ => _.Setting.Short.ToLower());
 
+            (string key, Dictionary<string, PropertyInfoPair>[] dics)[] tagStarts =
+                [
+                 ("--", [dicL]),
+                 ("-", [dicS]),
+                 ("/", [dicL,dicS])
+                 ];
+
             for (int i = 0; i < args.Length; i++)
             {
                 var part = args[i];
                 int splitIndex = part.IndexOf(":");
 
-                string tag = part.ToLower();
+                string tag = (splitIndex <= 0)
+                    ? part
+                    : part.Substring(0, splitIndex);
+                tag = tag.ToLower();
 
-                if (splitIndex > 0)
-                {
-                    tag = part.Substring(0, splitIndex);
-                }
+                PropertyInfoPair? piPair = null;
 
-                PropertyInfoPair? temp = null;
-                if (tag.StartsWith("--"))
+                var ts = tagStarts.FirstOrDefault(_ => tag.StartsWith(_.key));
+                if (!string.IsNullOrWhiteSpace(ts.key) && ts.dics.Length > 0)
                 {
-                    dicL.TryGetValue(tag.Substring(2), out temp);
-                }
-                else if (tag.StartsWith("-"))
-                {
-                    dicS.TryGetValue(tag.Substring(1), out temp);
-                }
-                else if (tag.StartsWith("/"))
-                {
-                    dicL.TryGetValue(tag.Substring(1), out temp);
-                    if (temp == null)
+                    var tagkey = tag.Substring(ts.key.Length);
+                    if (!string.IsNullOrWhiteSpace(tagkey))
                     {
-                        dicS.TryGetValue(tag.Substring(1), out temp);
+                        foreach (var dic in ts.dics)
+                        {
+                            if (dic.TryGetValue(tagkey, out piPair) && piPair != null)
+                            {
+                                break;
+                            }
+                        }
+
+                        if (piPair == null && hasMissing && (missings[0].Setting.Long.ToLower() == tagkey || missings[0].Setting.Short.ToLower() == tagkey))
+                        {
+                            piPair = missings[0];
+                            if (i < args.Length - 1)
+                            {
+                                i++;
+                                list.Add(args[i]);
+                                requires.Remove(missings[0]);
+                                continue;
+                            }
+                            else
+                            {
+                                throw new ApplicationException($"CommandLine Parameter Missing : {piPair.Setting.Long},{piPair.Setting.Short}");
+                            }
+                        }
                     }
                 }
                 else
                 {
                     list.Add(part);
+                    if (hasMissing)
+                    {
+                        requires.Remove(missings[0]);
+                    }
                     continue;
                 }
 
-                if (temp == null)
+                //if (tagStart == "--")
+                //{
+                //    dicL.TryGetValue(tagKey, out piPair);
+                //}
+                //else if (tag.StartsWith("-"))
+                //{
+                //    dicS.TryGetValue(tagKey, out piPair);
+                //}
+                //else if (tag.StartsWith("/"))
+                //{
+                //    dicL.TryGetValue(tagKey, out piPair);
+                //    if (piPair == null)
+                //    {
+                //        dicS.TryGetValue(tagKey, out piPair);
+                //    }
+                //}
+                //else
+                //{
+                //    list.Add(part);
+                //    if (missings.Count() == 1)
+                //    {
+                //        requires.Remove(missings[0]);
+                //    }
+                //    continue;
+                //}
+
+                if (piPair == null)
                 {
                     throw new ApplicationException("Invalid Command Parameter " + part);
                 }
 
-                if (temp.Setting.HasParameter)
+                if (piPair.Setting.HasParameter)
                 {
                     string param = "";
                     if (splitIndex > 0)
@@ -213,24 +274,41 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Util
                     }
                     else
                     {
-                        throw new ApplicationException($"CommandLine Parameter Missing : {temp.Setting.Long},{temp.Setting.Short}");
+                        throw new ApplicationException($"CommandLine Parameter Missing : {piPair.Setting.Long},{piPair.Setting.Short}");
                     }
 
-                    Setter(temp.pi, target, param);
+                    Setter(piPair.pi, target, param);
                 }
                 else
                 {
-                    if (temp.pi.PropertyType == typeof(bool))
+                    if (piPair.pi.PropertyType == typeof(bool))
                     {
-                        temp.pi.SetValue(target, true);
+                        bool flag = true;
+                        if (splitIndex > 0 && !Boolean.TryParse(part.Substring(splitIndex + 1), out flag))
+                        {
+                            throw new ApplicationException($"CommandLine Parameter Invalid flag : {piPair.Setting.Long},{piPair.Setting.Short}");
+                        }
+
+                        piPair.pi.SetValue(target, flag);
+
                     }
                     else
                     {
-                        temp.pi.SetValue(target, temp.Setting.Default);
+                        piPair.pi.SetValue(target, piPair.Setting.Default);
                     }
+                }
+
+                if (piPair.Setting.IsRequired)
+                {
+                    requires.Remove(piPair);
                 }
             }
 
+
+            if (requires.Count > 0)
+            {
+                throw new ApplicationException("Parameter Missing: " + string.Join(",", requires.Select(_ => _.Setting.Long)));
+            }
         }
 
         private static void Setter(PropertyInfo pi, object o, string s)
@@ -260,15 +338,16 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Util
                     var names = Enum.GetNames(t);
                     bool ignoreCase = names.Select(_ => _.ToLower()).Distinct().Count() == names.Count();
 
-                    if (Enum.TryParse(t, s, ignoreCase, out object? e))
+                    object? e = null;
+                    try
                     {
-                        pi.SetValue(o, e);
+                        e = Enum.Parse(t, s, ignoreCase);
                     }
-                    else
+                    catch
                     {
                         throw new ApplicationException($"Parameter value is not supported : {s}");
                     }
-
+                    pi.SetValue(o, e);
                 }
                 else
                 {
@@ -305,6 +384,11 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Util
                         yield return new PropertyInfoPair(a, pi);
                     }
                 }
+            }
+
+            public override string ToString()
+            {
+                return $"{pi.Name},{Setting.Long},{Setting.Short},{Setting.IsRequired}";
             }
         }
     }

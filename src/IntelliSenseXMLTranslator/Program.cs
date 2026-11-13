@@ -13,6 +13,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
     using Gekka.Language.IntelliSenseXMLTranslator.Work;
     using Gekka.Language.Translator;
     using Gekka.Language.Translator.Interfaces;
+    using Gekka.Language.IntelliSenseXMLTranslator.DB;
 
     internal class Program
     {
@@ -126,25 +127,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator
             }
 
 
-            DB.IStringDictionary dictionary;
-            if (parameters.DictionaryType == DB.DBType.Text)
-            {
-                if (string.IsNullOrWhiteSpace(parameters.DiffDictionary) || parameters.Dictionary == parameters.DiffDictionary)
-                {
-                    dictionary = new DB.StringDictionary(parameters.Dictionary, true);
-                }
-                else
-                {
-                    dictionary = new DB.DiffStringDictionary(new DB.StringDictionary(parameters.Dictionary, false), parameters.DiffDictionary, true);
-                }
-            }
-            else
-            {
-                dictionary = new DB.SQLStringDictionary(parameters.Dictionary, "Text");
-            }
-
-
-
+            DB.IStringDictionary dictionary = StringDictionaryFactory.Open(parameters);
             using (dictionary as IDisposable)
             {
                 using (ITranslator translator = factory.Create())

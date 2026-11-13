@@ -24,7 +24,7 @@ Visual StudioでのIntelliSenseに表示される情報を翻訳して日本語�
 翻訳済みのバージョンのxmlファイルはGitHubの[Releases](https://github.com/gekka/IntelliSenseXMLTranslator/releases)においてあります。
 
 ## 機能
-ローカルにある英語の情報が記述されているXMLファイルを日本語化に翻訳します。
+ローカルにある英語の情報が記述されているXMLファイルを日本語に翻訳します。
 
 翻訳はこのプロジェクトにある辞書ファイルを参照します。
 辞書ファイルにない英文は外部の翻訳機能を呼び出すことで翻訳を行います。

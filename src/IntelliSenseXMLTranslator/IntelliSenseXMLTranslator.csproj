@@ -2,13 +2,15 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0-windows7.0</TargetFramework>
+	<CheckEolTargetFramework>false</CheckEolTargetFramework>
+	  <!--<TargetFramework>net480</TargetFramework>-->
+    <TargetFramework>net10.0</TargetFramework>
       <!--<TargetFramework>net6.0-windows</TargetFramework>-->
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>Gekka.Language.IntellisenseXMLLocalizer</RootNamespace>
+    <RootNamespace>Gekka.Language.IntelliSenseXMLTranslator</RootNamespace>
     <BaseOutputPath>$(SolutionDir)Output</BaseOutputPath>
-      <!--<LangVersion>10.0</LangVersion>-->
+     <LangVersion>Latest</LangVersion>
 
 	  <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
@@ -22,20 +24,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\DataFiles\Dictionary.ja.dat" Link="DataFiles\Dictionary.ja.dat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <None Include="..\DataFiles\InputXmlFIles.list" Link="DataFiles\InputXmlFIles.list">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\DataFiles\SkipFiles.list" Link="DataFiles\SkipFiles.list">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-	<None Include="..\DataFiles\SkipTokens.list" Link="DataFiles\SkipTokens.list">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
+    <Compile Remove="Test.cs" />
   </ItemGroup>
 
+    <ItemGroup>
+	    <Content Include="..\DataFiles\*.dat" >
+		    <LinkBase>DataFiles</LinkBase>
+		    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    </Content>
+	    <Content Include="..\DataFiles\*.list" >
+		    <LinkBase>DataFiles</LinkBase>
+		    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    </Content>
+	    <None Include="Test.cs" />
+    </ItemGroup>
+	
   <ItemGroup>
     <PackageReference Include="Gekka.MSBuild.targets.SignTool" Version="0.2.9150.31270" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

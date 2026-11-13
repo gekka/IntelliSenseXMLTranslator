@@ -30,10 +30,10 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
         [CommandLineArgs("DicType", "DT", "辞書ファイル種類", Description = "標準ではテキスト辞書を使用します。\r\n必要ならSQliteの辞書を作成もできます")]
         public DBType DictionaryType { get; set; } = DBType.Text;
 
-        [CommandLineArgs(nameof(Translator), "T", "翻訳機の名前", IsRequired = true, Description = "後述の翻訳機の名前のいずれかを指定します")]
+        [CommandLineArgs(nameof(Translator), "T", "翻訳機の名前", Description = "後述の翻訳機の名前のいずれかを指定します")]
         public string? Translator { get; set; }
 
-        [CommandLineArgs(nameof(Browser), "B", "使用するブラウザの名前", IsRequired = true, Description = "ブラウザ翻訳させる場合に使用するブラウザ名を指定します")]
+        [CommandLineArgs(nameof(Browser), "B", "使用するブラウザの名前", Description = "ブラウザ翻訳させる場合に使用するブラウザ名を指定します")]
         public BrowserNames Browser { get; set; } = BrowserNames.Chrome;
 
         [CommandLineArgs("Point", "P", "翻訳結果をどのように表示させるかを指定します")]
@@ -57,7 +57,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
         [CommandLineArgs(nameof(SkipFiles), "S", "標準では処理不可能としてスキップするリストファイル\r\n\r\n一部のファイルで不正な構造のXMLのために処理不可能な場合がある。\r\nそのようなファイルを無視リストアフィルで指定する")]
         public string SkipFiles { get; set; } = "";
 
-        [CommandLineArgs(nameof(SkipTokens), "SKT", "このsリストファイルに含まれている単語を含む文章を翻訳対象から除外する\r\n\r\nアセンブラなどの説明はアセンブラそのままなので翻訳させたくない場合がある。")]
+        [CommandLineArgs(nameof(SkipTokens), "SKT", "このリストファイルに含まれている単語を含む文章を翻訳対象から除外する\r\n\r\nアセンブラなどの説明はアセンブラそのままなので翻訳させたくない場合がある。")]
         public string SkipTokens { get; set; } = "";
 
         [CommandLineArgs("Files", "", "入力元のフォルダかファイル(.xml or .list)のパス\r\n\r\n直接XMLファイルを指定するか、リストファイルで指定します", IsRequired = true, IsMissingList = true)]
@@ -93,7 +93,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
             }
             else
             {
-                return  new SkipTokens();
+                return new SkipTokens();
             }
         }
     }
@@ -114,9 +114,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Work
 
         public bool IsKip(string text)
         {
-            return this.Tokens.Count != 0 && this.Tokens.Any(_ => text.Contains(_, System.StringComparison.Ordinal));
+            return this.Tokens.Count != 0 && this.Tokens.Any(_ => text.Contains(_));
         }
     }
-
-
 }

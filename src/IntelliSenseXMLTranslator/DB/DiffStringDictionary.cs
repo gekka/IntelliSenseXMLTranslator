@@ -5,23 +5,23 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class DiffStringDictionary : IDictionary<string, string>, IDisposable, IStringDictionary
+    internal class DiffStringDictionary : IDictionary<string, string>, IDisposable, IStringDictionary
     {
-        public DiffStringDictionary(StringDictionary dic, StringDictionary newdic)
+        public DiffStringDictionary(IStringDictionary dic, StringDictionary newdic)
         {
             this.dic = dic;
             this.newdic = newdic;
         }
-        public DiffStringDictionary(StringDictionary dic, string dbPath, bool autoSave = true)
+        public DiffStringDictionary(IStringDictionary dic, string dbPath, bool autoSave = true)
             : this(dic, new StringDictionary(dbPath, autoSave))
         {
         }
-        public DiffStringDictionary(StringDictionary dic, string dbPath, System.Text.Encoding enc, bool autoSave = true)
+        public DiffStringDictionary(IStringDictionary dic, string dbPath, System.Text.Encoding enc, bool autoSave = true)
             : this(dic, new StringDictionary(dbPath, enc, autoSave))
         {
         }
 
-        private StringDictionary dic;
+        private IStringDictionary dic;
         private StringDictionary newdic;
 
         /// <summary>保存</summary>
@@ -67,7 +67,7 @@
         /// <inheritdoc />
         public ICollection<string> Keys => dic.Keys.Concat(newdic.Keys).ToArray();
         /// <inheritdoc />
-        public ICollection<string> Values => dic.Values.Concat(newdic.Keys).ToArray();
+        public ICollection<string> Values => dic.Values.Concat(newdic.Values).ToArray();
         /// <inheritdoc />
         public void Add(KeyValuePair<string, string> item)
         {

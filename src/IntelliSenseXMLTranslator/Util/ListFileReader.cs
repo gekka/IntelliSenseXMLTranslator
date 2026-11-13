@@ -20,7 +20,7 @@ namespace Gekka.Language.IntelliSenseXMLTranslator.Util
                     continue;
                 }
                 line = System.Environment.ExpandEnvironmentVariables(line);
-                if (line.StartsWith('\"') && line.EndsWith('\"') & line.Length > 2)
+                if (line.StartsWith("\"") && line.EndsWith("\"") & line.Length > 2)
                 {
                     line = line.Substring(1, line.Length - 2);
                 }

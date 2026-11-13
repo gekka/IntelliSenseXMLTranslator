@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Text;
 
-    public class StringDictionary : IDictionary<string, string>, IDisposable, IStringDictionary
+    internal class StringDictionary : IDictionary<string, string>, IDisposable, IStringDictionary
     {
         public StringDictionary(string dbPath, bool autoSave = true)
             : this(dbPath, new System.Text.UTF8Encoding(true), autoSave)
@@ -38,8 +38,8 @@
                 {
                     while (sr.Peek() != -1)
                     {
-                        var k = sr.ReadLine()?.Replace(X_CR, "\r").Replace(X_LF, "\n");
-                        var v = sr.ReadLine()?.Replace(X_CR, "\r").Replace(X_LF, "\n");
+                        var k = sr.ReadLine()?.Replace(X_CR, "\r").Replace(X_LF, "\n");//英語
+                        var v = sr.ReadLine()?.Replace(X_CR, "\r").Replace(X_LF, "\n");//日本語
                         if (k != null && v != null)
                         {
                             Add(k, v);
